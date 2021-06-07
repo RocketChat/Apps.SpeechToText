@@ -1,0 +1,15 @@
+{
+    "id": "0cb2ef83-b652-4862-9331-275ccbf2bfa7",
+    "version": "0.0.1",
+    "requiredApiVersion": "^1.4.0",
+    "iconFile": "icon.png",
+    "author": {
+        "name": "Kartik Gupta",
+        "homepage": "https://github.com/Kartik18g",
+        "support": "https://github.com/Kartik18g"
+    },
+    "name": "SpeechToText",
+    "nameSlug": "speechtotext",
+    "classFile": "SpeechToTextApp.ts",
+    "description": "A Rocket.Chat App to transcribe audio messages"
+}
