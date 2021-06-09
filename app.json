@@ -11,6 +11,6 @@
     "name": "SpeechToText",
     "nameSlug": "speechtotext",
     "classFile": "SpeechToTextApp.ts",
-    "description": "A Rocket.Chat App to transcribe audio messages",
+    "description": "A Rocket.Chat App to transcribe audio messages sent in Chat. \n You need to enable Enable_Json_Web_Tokens_protection setting in the FileUpload section of the administration with JWT secret provided to be able to use this app",
     "implements": []
 }
