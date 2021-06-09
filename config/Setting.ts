@@ -1,10 +1,18 @@
 import { ISetting, SettingType } from '@rocket.chat/apps-engine/definition/settings';
 
+export enum AppSetting {
+    API_PROVIDER = 'api-provider',
+    API_KEY = 'api-key',
+    JWT_SECRET = 'jwt-secret',
+    ASSEMBLY = 'Assembly',
+    REV = 'Rev',
+    GOOGLE = 'Google'
+}
 
 
 export const settings: Array<ISetting> = [
     {
-        id: "api-provider",
+        id: AppSetting.API_PROVIDER,
         i18nLabel: "API Provider",
         i18nDescription: "Select you API provider",
         required: true,
@@ -13,21 +21,21 @@ export const settings: Array<ISetting> = [
         packageValue: "",
         values: [
             {
-                key: "Assembly",
+                key: AppSetting.ASSEMBLY,
                 i18nLabel: "Assembly AI",
             },
             {
-                key: "Rev",
+                key: AppSetting.REV,
                 i18nLabel: "Rev.AI",
             },
             {
-                key: "Google",
+                key: AppSetting.GOOGLE,
                 i18nLabel: "Google Speech to Text API",
             },
         ],
     },
     {
-        id: "api-key",
+        id: AppSetting.API_KEY,
         i18nLabel: "API Key",
         i18nDescription: "Provide your API key here",
         required: true,
@@ -36,7 +44,7 @@ export const settings: Array<ISetting> = [
         packageValue: "",
     },
     {
-        id: "jwt-secret",
+        id: AppSetting.JWT_SECRET,
         i18nLabel: "JWT Secret",
         i18nDescription: "You FileUpload JWT secret (Should be same as JWT secret in FileUpload setting)",
         required: true,
@@ -44,13 +52,13 @@ export const settings: Array<ISetting> = [
         public: true,
         packageValue: "",
     },
-    {
-        id: "min-duration",
-        i18nLabel: "Minimum Duration",
-        i18nDescription: "Minimum duration for an audio file to be queued to transcription in seconds",
-        required: true,
-        type: SettingType.NUMBER,
-        public: true,
-        packageValue: 2,
-    },
+    // {
+    //     id: "min-duration",
+    //     i18nLabel: "Minimum Duration",
+    //     i18nDescription: "Minimum duration for an audio file to be queued to transcription in seconds",
+    //     required: true,
+    //     type: SettingType.NUMBER,
+    //     public: true,
+    //     packageValue: 5,
+    // },
 ];

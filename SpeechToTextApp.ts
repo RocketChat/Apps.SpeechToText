@@ -14,9 +14,21 @@ import { IMessage, IPreMessageSentExtend, MessageActionButtonsAlignment, Message
 import { IAppInfo } from '@rocket.chat/apps-engine/definition/metadata';
 import { settings } from './config/Setting';
 import { webhookEndpoint } from './endpoints/webhookEndpoint';
-import { checkForAudio } from './helpers/attachmentHelper';
+import { getAudioAttachment, isAudio } from './helpers/attachmentHelper';
 
 export class SpeechToTextApp extends App implements IPreMessageSentExtend {
+
+
+    // username alias
+
+    public botName: string = "SpeechToText-BOT";
+
+    /**
+     * The bot avatar
+     */
+    public botAvatar: string = ":stt:";
+
+
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
         super(info, logger, accessors);
     }
@@ -27,7 +39,7 @@ export class SpeechToTextApp extends App implements IPreMessageSentExtend {
     ): Promise<void> {
         // user settings
         await Promise.all(settings.map((setting) => configuration.settings.provideSetting(setting)));
-        // API
+        // API Webhook
         configuration.api.provideApi({
             visibility: ApiVisibility.PUBLIC,
             security: ApiSecurity.UNSECURE,
@@ -41,19 +53,34 @@ export class SpeechToTextApp extends App implements IPreMessageSentExtend {
         http: IHttp
     ): Promise<boolean> {
 
-        console.log("this is what was returned", checkForAudio(message))
+        console.log("this is what was returned", isAudio(message))
 
-        return checkForAudio(message)
+        return isAudio(message)
 
     }
 
     public async executePreMessageSentExtend(message: IMessage, extend: IMessageExtender, read: IRead, http: IHttp, persistence: IPersistence): Promise<IMessage> {
         console.log("NOW RUNNIGN POST")
+        // collect fields required
+        const audioAttachment = getAudioAttachment(message)
+        const rid = message.room.id
+        const fileId = message.file?._id
+        const messageId = message.id
+        const audioURL = audioAttachment.audioUrl
+        // adding a slashcommand button with required fields
+        extend.addAttachment({
+            color: "#2576F5",
+            actionButtonsAlignment: MessageActionButtonsAlignment.HORIZONTAL,
+            text: "Click the button to queue audio for transcription",
+            actions: [
+                {
+                    text: 'Transcribe',
+                    type: MessageActionType.BUTTON,
+                    msg_in_chat_window: true,
+                    msg: `/stt ${rid} ${fileId} ${messageId} ${audioURL}`,
+                },
+            ],
+        })
         return message
     }
-
-
-
-
-
 }
