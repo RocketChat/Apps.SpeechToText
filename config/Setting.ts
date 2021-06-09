@@ -4,15 +4,6 @@ import { ISetting, SettingType } from '@rocket.chat/apps-engine/definition/setti
 
 export const settings: Array<ISetting> = [
     {
-        id: "jwt-secret",
-        i18nLabel: "JWT Secret",
-        i18nDescription: "You FileUpload JWT secret (Should be same as JWT secret in FileUpload setting)",
-        required: true,
-        type: SettingType.STRING,
-        public: true,
-        packageValue: "",
-    },
-    {
         id: "api-provider",
         i18nLabel: "API Provider",
         i18nDescription: "Select you API provider",
@@ -43,5 +34,23 @@ export const settings: Array<ISetting> = [
         type: SettingType.STRING,
         public: true,
         packageValue: "",
-    }
+    },
+    {
+        id: "jwt-secret",
+        i18nLabel: "JWT Secret",
+        i18nDescription: "You FileUpload JWT secret (Should be same as JWT secret in FileUpload setting)",
+        required: true,
+        type: SettingType.STRING,
+        public: true,
+        packageValue: "",
+    },
+    {
+        id: "min-duration",
+        i18nLabel: "Minimum Duration",
+        i18nDescription: "Minimum duration for an audio file to be queued to transcription in seconds",
+        required: true,
+        type: SettingType.NUMBER,
+        public: true,
+        packageValue: 2,
+    },
 ];

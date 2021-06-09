@@ -14,6 +14,7 @@ import { IMessage, IPreMessageSentExtend, MessageActionButtonsAlignment, Message
 import { IAppInfo } from '@rocket.chat/apps-engine/definition/metadata';
 import { settings } from './config/Setting';
 import { webhookEndpoint } from './endpoints/webhookEndpoint';
+import { checkForAudio } from './helpers/attachmentHelper';
 
 export class SpeechToTextApp extends App implements IPreMessageSentExtend {
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
@@ -39,19 +40,15 @@ export class SpeechToTextApp extends App implements IPreMessageSentExtend {
         read: IRead,
         http: IHttp
     ): Promise<boolean> {
-        // Check if message has an audio attachment
-        if (message.attachments && message.attachments.length > 0) {
-            if (message.attachments[0].audioUrl) {
-                // If true execute executePreMessageSentExtend
-                return true;
-            }
-        }
-        // if not return false and do not execute executePreMessageSentExtend
-        return false;
+
+        console.log("this is what was returned", checkForAudio(message))
+
+        return checkForAudio(message)
+
     }
 
     public async executePreMessageSentExtend(message: IMessage, extend: IMessageExtender, read: IRead, http: IHttp, persistence: IPersistence): Promise<IMessage> {
-        console.log({ message, room: message.room })
+        console.log("NOW RUNNIGN POST")
         return message
     }
 
