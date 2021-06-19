@@ -50,7 +50,7 @@ export class QueueAudioCommand implements ISlashCommand {
 
             }]).setEditor(sender)
 
-            sendMessage(modify, room, { text: "File Queued for transcription", userId: context.getSender().id })
+            // sendMessage(modify, room, { text: "File Queued for transcription", userId: context.getSender().id })
             await messageUpdater.finish(builder)
         } catch (error) {
             console.log(error)

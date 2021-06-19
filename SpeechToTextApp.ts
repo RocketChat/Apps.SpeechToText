@@ -14,7 +14,7 @@ import { App } from '@rocket.chat/apps-engine/definition/App';
 import { IMessage, IPreMessageSentExtend, MessageActionButtonsAlignment, MessageActionType } from '@rocket.chat/apps-engine/definition/messages';
 import { IAppInfo } from '@rocket.chat/apps-engine/definition/metadata';
 import { ISetting } from '@rocket.chat/apps-engine/definition/settings';
-import { QueueAudioCommand } from './commands/QueueAudio';
+import { QueueAudioCommand } from './commands/SttCommand';
 import { settings } from './config/Setting';
 import { webhookEndpoint } from './endpoints/webhookEndpoint';
 import { getAudioAttachment, isAudio } from './helpers/attachmentHelper';
