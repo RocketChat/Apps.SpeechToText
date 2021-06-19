@@ -14,6 +14,13 @@ export function isAudio(message: IMessage): boolean {
 
 }
 
+export function removeSttAttachment(attachments: Array<IMessageAttachment>): Array<IMessageAttachment> {
+
+    const newAttachments = attachments.filter(attachment => attachment.title?.value !== 'SpeechToText'
+    )
+    return newAttachments
+}
+
 // function to vaidate the audio duration
 export function getAudioAttachment(message: IMessage): IMessageAttachment {
     // get audio attachment from the message
@@ -22,17 +29,3 @@ export function getAudioAttachment(message: IMessage): IMessageAttachment {
 
     return audioFile!
 }
-
-// function to vaidate the audio duration
-// export async function isValid(message: IMessage, read: IRead): Promise<boolean> {
-//     // get min audio duration from user settings
-//     const duration = await read.getEnvironmentReader().getSettings().getValueById('min-duration')
-
-//     // get audio attachment from the message
-//     // can use ! because of the isAudio Check
-//     const audioFile = message.attachments!.find(attachment => attachment.audioUrl!.length > 0)
-
-//     console.log("PIA", { audioFile, duration })
-
-//     return false
-// }

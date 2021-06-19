@@ -12,6 +12,7 @@ import { ApiSecurity, ApiVisibility } from '@rocket.chat/apps-engine/definition/
 import { App } from '@rocket.chat/apps-engine/definition/App';
 import { IMessage, IPreMessageSentExtend, MessageActionButtonsAlignment, MessageActionType } from '@rocket.chat/apps-engine/definition/messages';
 import { IAppInfo } from '@rocket.chat/apps-engine/definition/metadata';
+import { QueueAudioCommand } from './commands/QueueAudio';
 import { settings } from './config/Setting';
 import { webhookEndpoint } from './endpoints/webhookEndpoint';
 import { getAudioAttachment, isAudio } from './helpers/attachmentHelper';
@@ -45,6 +46,10 @@ export class SpeechToTextApp extends App implements IPreMessageSentExtend {
             security: ApiSecurity.UNSECURE,
             endpoints: [new webhookEndpoint(this)],
         });
+        // Slash command
+        await configuration.slashCommands.provideSlashCommand(
+            new QueueAudioCommand(this)
+        );
     }
 
     public async checkPreMessageSentExtend(
@@ -60,7 +65,6 @@ export class SpeechToTextApp extends App implements IPreMessageSentExtend {
     }
 
     public async executePreMessageSentExtend(message: IMessage, extend: IMessageExtender, read: IRead, http: IHttp, persistence: IPersistence): Promise<IMessage> {
-        console.log("NOW RUNNIGN POST")
         // collect fields required
         const audioAttachment = getAudioAttachment(message)
         const rid = message.room.id
@@ -71,13 +75,14 @@ export class SpeechToTextApp extends App implements IPreMessageSentExtend {
         extend.addAttachment({
             color: "#2576F5",
             actionButtonsAlignment: MessageActionButtonsAlignment.HORIZONTAL,
-            text: "Click the button to queue audio for transcription",
+            title: { value: "SpeechToText" },
+            text: "Queue audio file for transcription",
             actions: [
                 {
                     text: 'Transcribe',
                     type: MessageActionType.BUTTON,
                     msg_in_chat_window: true,
-                    msg: `/stt ${rid} ${fileId} ${messageId} ${audioURL}`,
+                    msg: `/stt-queue ${rid} ${fileId} ${messageId} ${audioURL}`,
                 },
             ],
         })
