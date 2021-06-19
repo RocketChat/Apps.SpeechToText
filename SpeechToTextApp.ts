@@ -1,6 +1,7 @@
 import {
     IAppAccessors,
     IConfigurationExtend,
+    IConfigurationModify,
     IEnvironmentRead,
     IHttp,
     ILogger,
@@ -12,27 +13,58 @@ import { ApiSecurity, ApiVisibility } from '@rocket.chat/apps-engine/definition/
 import { App } from '@rocket.chat/apps-engine/definition/App';
 import { IMessage, IPreMessageSentExtend, MessageActionButtonsAlignment, MessageActionType } from '@rocket.chat/apps-engine/definition/messages';
 import { IAppInfo } from '@rocket.chat/apps-engine/definition/metadata';
+import { ISetting } from '@rocket.chat/apps-engine/definition/settings';
 import { QueueAudioCommand } from './commands/QueueAudio';
 import { settings } from './config/Setting';
 import { webhookEndpoint } from './endpoints/webhookEndpoint';
 import { getAudioAttachment, isAudio } from './helpers/attachmentHelper';
+import { SttInterface } from './lib/interface/SttInterface';
+import { Assembly } from './lib/providers/Assembly';
 
 export class SpeechToTextApp extends App implements IPreMessageSentExtend {
 
 
     // username alias
-
     public botName: string = "SpeechToText-BOT";
 
-    /**
-     * The bot avatar
-     */
+    //Avatar alias
     public botAvatar: string = ":stt:";
+
+    public readonly Assembly: Assembly
+
+    public provider
 
 
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
         super(info, logger, accessors);
     }
+
+
+    /**
+     * Updates room ids for members and messages when settings are updated
+     *
+     * @param setting
+     * @param configModify
+     * @param read
+     * @param http
+     */
+    public async onSettingUpdated(
+        setting: ISetting,
+        configModify: IConfigurationModify,
+        read: IRead,
+        http: IHttp
+    ): Promise<void> {
+        if (setting.id === "api-provider") {
+            console.log('-->>>++++++', setting.value)
+            switch (setting.value) {
+                case "Assembly":
+                    this.provider = new Assembly()
+                    break;
+            }
+        }
+    }
+
+
 
     protected async extendConfiguration(
         configuration: IConfigurationExtend,
