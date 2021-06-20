@@ -17,7 +17,7 @@ import { ISetting } from '@rocket.chat/apps-engine/definition/settings';
 import { QueueAudioCommand } from './commands/SttCommand';
 import { settings } from './config/Setting';
 import { webhookEndpoint } from './endpoints/webhookEndpoint';
-import { getAudioAttachment, isAudio } from './helpers/attachmentHelper';
+import { getAudioAttachment, isAudio } from './helpers/attachmentHelpers';
 import { sendMessage } from './helpers/messageHelpers';
 import { SttInterface } from './lib/interface/SttInterface';
 import { Assembly } from './lib/providers/Assembly';

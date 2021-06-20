@@ -10,7 +10,7 @@ import {
 } from "@rocket.chat/apps-engine/definition/accessors";
 import { App } from "@rocket.chat/apps-engine/definition/App";
 import { MessageActionButtonsAlignment, MessageActionType } from "@rocket.chat/apps-engine/definition/messages";
-import { removeSttAttachment } from "../helpers/attachmentHelper";
+import { removeSttAttachment } from "../helpers/attachmentHelpers";
 import { sendMessage } from "../helpers/messageHelpers";
 
 
