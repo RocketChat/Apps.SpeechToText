@@ -31,9 +31,11 @@ export class SpeechToTextApp extends App implements IPreMessageSentExtend {
     //Avatar alias
     public botAvatar: string = ":stt:";
 
+    public provider
+
+
     public readonly Assembly: Assembly
 
-    public provider
 
 
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
@@ -56,13 +58,33 @@ export class SpeechToTextApp extends App implements IPreMessageSentExtend {
         http: IHttp
     ): Promise<void> {
         if (setting.id === "api-provider") {
-            console.log('-->>>++++++', setting.value)
             switch (setting.value) {
                 case "Assembly":
                     this.provider = new Assembly()
                     break;
             }
         }
+    }
+
+    /**
+     * Loads the room where to get members from
+     * Loads the room where to post messages to
+     * Loads the user who'll be posting messages as the botUser
+     *
+     * @param environmentRead
+     * @param configModify
+     */
+    public async onEnable(
+        environmentRead: IEnvironmentRead,
+        configModify: IConfigurationModify
+    ): Promise<boolean> {
+        const setting = await environmentRead.getSettings().getById("api-provider")
+        switch (setting.value) {
+            case "Assembly":
+                this.provider = new Assembly()
+                break;
+        }
+        return true;
     }
 
 
@@ -97,6 +119,7 @@ export class SpeechToTextApp extends App implements IPreMessageSentExtend {
 
     public async executePreMessageSentExtend(message: IMessage, extend: IMessageExtender, read: IRead, http: IHttp, persistence: IPersistence): Promise<IMessage> {
 
+
         // check for settings
         const api_key: string = await read
             .getEnvironmentReader()
@@ -118,7 +141,7 @@ export class SpeechToTextApp extends App implements IPreMessageSentExtend {
             const rid = message.room.id
             const fileId = message.file?._id
             const messageId = message.id
-            const audioURL = audioAttachment.audioUrl
+            const audioUrl = audioAttachment.audioUrl
             // adding a slashcommand button with required fields
             extend.addAttachment({
                 color: "#2576F5",
@@ -130,7 +153,7 @@ export class SpeechToTextApp extends App implements IPreMessageSentExtend {
                         text: 'Transcribe',
                         type: MessageActionType.BUTTON,
                         msg_in_chat_window: true,
-                        msg: `/stt-queue ${rid} ${fileId} ${messageId} ${audioURL}`,
+                        msg: `/stt-queue ${rid} ${fileId} ${messageId} ${audioUrl}`,
                     },
                 ],
             })
