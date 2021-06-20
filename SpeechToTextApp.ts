@@ -18,6 +18,7 @@ import { QueueAudioCommand } from './commands/SttCommand';
 import { settings } from './config/Setting';
 import { webhookEndpoint } from './endpoints/webhookEndpoint';
 import { getAudioAttachment, isAudio } from './helpers/attachmentHelper';
+import { sendMessage } from './helpers/messageHelpers';
 import { SttInterface } from './lib/interface/SttInterface';
 import { Assembly } from './lib/providers/Assembly';
 
@@ -90,34 +91,54 @@ export class SpeechToTextApp extends App implements IPreMessageSentExtend {
         http: IHttp
     ): Promise<boolean> {
 
-        console.log("this is what was returned", isAudio(message))
-
         return isAudio(message)
 
     }
 
     public async executePreMessageSentExtend(message: IMessage, extend: IMessageExtender, read: IRead, http: IHttp, persistence: IPersistence): Promise<IMessage> {
-        // collect fields required
-        const audioAttachment = getAudioAttachment(message)
-        const rid = message.room.id
-        const fileId = message.file?._id
-        const messageId = message.id
-        const audioURL = audioAttachment.audioUrl
-        // adding a slashcommand button with required fields
-        extend.addAttachment({
-            color: "#2576F5",
-            actionButtonsAlignment: MessageActionButtonsAlignment.HORIZONTAL,
-            title: { value: "SpeechToText" },
-            text: "Queue audio file for transcription",
-            actions: [
-                {
-                    text: 'Transcribe',
-                    type: MessageActionType.BUTTON,
-                    msg_in_chat_window: true,
-                    msg: `/stt-queue ${rid} ${fileId} ${messageId} ${audioURL}`,
-                },
-            ],
-        })
+
+        // check for settings
+        const api_key: string = await read
+            .getEnvironmentReader()
+            .getSettings()
+            .getValueById("api-key");
+        const api_provider: string = await read
+            .getEnvironmentReader()
+            .getSettings()
+            .getValueById("api-provider");
+        const jwt_secret: string = await read
+            .getEnvironmentReader()
+            .getSettings()
+            .getValueById("jwt-secret");
+
+        if (api_key.length > 0 && api_provider.length > 0 && jwt_secret.length > 0) {
+            // collect fields required
+
+            const audioAttachment = getAudioAttachment(message)
+            const rid = message.room.id
+            const fileId = message.file?._id
+            const messageId = message.id
+            const audioURL = audioAttachment.audioUrl
+            // adding a slashcommand button with required fields
+            extend.addAttachment({
+                color: "#2576F5",
+                actionButtonsAlignment: MessageActionButtonsAlignment.HORIZONTAL,
+                title: { value: "SpeechToText" },
+                text: "Queue audio file for transcription",
+                actions: [
+                    {
+                        text: 'Transcribe',
+                        type: MessageActionType.BUTTON,
+                        msg_in_chat_window: true,
+                        msg: `/stt-queue ${rid} ${fileId} ${messageId} ${audioURL}`,
+                    },
+                ],
+            })
+        } else {
+            console.log("Settings not provided")
+        }
+
+
         return message
     }
 }
