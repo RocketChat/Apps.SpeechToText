@@ -67,10 +67,6 @@ export class SpeechToTextApp extends App implements IPreMessageSentExtend {
     }
 
     /**
-     * Loads the room where to get members from
-     * Loads the room where to post messages to
-     * Loads the user who'll be posting messages as the botUser
-     *
      * @param environmentRead
      * @param configModify
      */
