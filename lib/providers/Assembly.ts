@@ -1,12 +1,11 @@
 import { IHttp, IRead, IModify } from "@rocket.chat/apps-engine/definition/accessors";
-import { generateJWT } from "../../helpers/jwtHelpers";
+import { generateJWT, getPayload } from "../../helpers/jwtHelpers";
 import { sendMessage, updateSttMessage } from "../../helpers/messageHelpers";
 import { SttInterface } from "../interface/SttInterface";
 
 export class Assembly implements SttInterface {
 
-    public host = "http://df6aa0c173f1.ngrok.io"
-
+    public host = "http://23ad9d0b46a3.ngrok.io"
 
     async queueAudio(data: any, http: IHttp, read: IRead, modify: IModify): Promise<void> {
         console.log("QUeued for transcription")
@@ -59,7 +58,30 @@ export class Assembly implements SttInterface {
 
     async getTranscript(data: any, http: IHttp, read: IRead, modify: IModify): Promise<void> {
         console.log("WebhookReponseIsThis", data)
+        const { transcript_id, status } = data
+        if (status === "completed") {
+            const reqUrl = `https://api.assemblyai.com/v2/transcript/${transcript_id}`
+            const api_key: string = await read
+                .getEnvironmentReader()
+                .getSettings()
+                .getValueById("api-key");
+            var response = await http.get(reqUrl, {
+                headers: {
+                    ["authorization"]: `${api_key}`,
+                    ["content-type"]: "application/json",
+                },
+            });
+            const responseData = response.data
+            console.log("This is transcript data", response.data)
+            const { audio_url, text } = responseData
+            console.log({ audio_url, text })
+            const token = audio_url.split('token=')[1]
+            const payload = getPayload(token.split("&")[0])
 
+            const sender = await read.getUserReader().getById("rocket.cat");
+            const { messageId } = payload.context
+            updateSttMessage({ messageId, text, color: "#800080" }, sender, modify)
+        }
     }
 
 }
