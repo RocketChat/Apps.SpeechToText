@@ -58,7 +58,8 @@ export class Assembly implements SttInterface {
 
 
     async getTranscript(data: any, http: IHttp, read: IRead, modify: IModify): Promise<void> {
-        console.log("Now getting the transcript")
+        console.log("WebhookReponseIsThis", data)
+
     }
 
 }

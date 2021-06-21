@@ -10,9 +10,14 @@ import {
     IApiRequest,
     IApiResponse,
 } from "@rocket.chat/apps-engine/definition/api";
+import { SpeechToTextApp } from "../SpeechToTextApp";
 
 export class webhookEndpoint extends ApiEndpoint {
     public path = "stt-webhook";
+
+    constructor(public app: SpeechToTextApp) {
+        super(app);
+    }
 
     async post(
         request: IApiRequest,
@@ -22,6 +27,7 @@ export class webhookEndpoint extends ApiEndpoint {
         http: IHttp,
         persis: IPersistence
     ): Promise<IApiResponse> {
+        this.app.provider.getTranscript(request.content, http, read, modify)
         return this.success();
     }
 }
