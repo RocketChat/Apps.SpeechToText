@@ -23,11 +23,7 @@ export const settings: Array<ISetting> = [
             {
                 key: AppSetting.ASSEMBLY,
                 i18nLabel: "Assembly AI",
-            },
-            {
-                key: AppSetting.GOOGLE,
-                i18nLabel: "Google Speech to Text API",
-            },
+            }
         ],
     },
     {
