@@ -40,12 +40,12 @@ export class QueueAudioCommand implements ISlashCommand {
 
 
         console.log({ rid, fileId, messageId, audioUrl, sender })
+        // update status to queuing
+        updateSttMessage({ text: "File Queued for transcription", color: "#ffbf00", messageId, button: true, buttonText: "Queued.." }, sender, modify)
+
         const data = {
             rid, fileId, messageId, userId: context.getSender(), audioUrl
         }
-
-        updateSttMessage({ text: "File Queued for transcription", color: "#ffbf00", messageId }, sender, modify)
-
 
         this.app.provider.queueAudio(data, http, read, modify)
 

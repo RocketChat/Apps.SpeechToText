@@ -5,7 +5,7 @@ import { SttInterface } from "../interface/SttInterface";
 
 export class Assembly implements SttInterface {
 
-    public host = "http://87ce62e281fc.ngrok.io"
+    public host = "http://df6aa0c173f1.ngrok.io"
 
 
     async queueAudio(data: any, http: IHttp, read: IRead, modify: IModify): Promise<void> {
@@ -16,6 +16,10 @@ export class Assembly implements SttInterface {
             .getEnvironmentReader()
             .getSettings()
             .getValueById("api-key");
+        const jwt_secret: string = await read
+            .getEnvironmentReader()
+            .getSettings()
+            .getValueById("jwt-secret");
 
         let jwtToken = generateJWT({
             typ: 'JWT',
@@ -25,16 +29,12 @@ export class Assembly implements SttInterface {
             userId,
             fileId,
             messageId,
-            secret: "Pia"
-        }, 'Pia')
+        }, jwt_secret)
         // Appending the JWT token to audioURL and getting the final recording URL which is to be sent to the provider
         let recordingUrl = `${this.host}${audioUrl}?token=${jwtToken}`;
         let webhook_url = `${this.host}/api/apps/public/0cb2ef83-b652-4862-9331-275ccbf2bfa7/stt-webhook`;
         let reqUrl = "https://api.assemblyai.com/v2/transcript";
-        let body = {
-            audio_url: recordingUrl,
-            webhook_url,
-        };
+
         let response = await http.post(reqUrl, {
             data: {
                 audio_url: recordingUrl,
@@ -47,20 +47,14 @@ export class Assembly implements SttInterface {
         });
         if (response && response.data.status === "queued") {
             // do nothing
+            console.log(response.data)
         } else {
-            console.log("error queuing message")
-            const message = await modify.getCreator().startMessage();
-            message
-                .setRoom(rid)
-                .setEmojiAvatar(":stt:")
-                .setText("Error Queing file try again ")
-                .setGroupable(false);
-            await modify.getCreator().finish(message);
+            const sender = await read.getUserReader().getById("rocket.cat");
+            updateSttMessage({ text: "Failed, try again !!", color: "#dc143c", messageId, button: true, buttonText: "ReQueue", buttonMessage: `/stt-queue ${rid} ${fileId} ${messageId} ${audioUrl}` }, sender, modify)
+
         }
 
     }
-
-
 
 
     async getTranscript(data: any, http: IHttp, read: IRead, modify: IModify): Promise<void> {
