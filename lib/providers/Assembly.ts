@@ -63,29 +63,33 @@ export class Assembly implements SttInterface {
     async getTranscript(data: any, http: IHttp, read: IRead, modify: IModify): Promise<void> {
         console.log("WebhookReponseIsThis", data)
         const { transcript_id, status } = data
-        if (status === "completed") {
-            const reqUrl = `https://api.assemblyai.com/v2/transcript/${transcript_id}`
-            const api_key: string = await read
-                .getEnvironmentReader()
-                .getSettings()
-                .getValueById("api-key");
-            var response = await http.get(reqUrl, {
-                headers: {
-                    ["authorization"]: `${api_key}`,
-                    ["content-type"]: "application/json",
-                },
-            });
-            const responseData = response.data
-            console.log("This is transcript data", response.data)
-            const { audio_url, text } = responseData
-            console.log({ audio_url, text })
-            const token = audio_url.split('token=')[1]
-            const payload = getPayload(token.split("&")[0])
+        const reqUrl = `https://api.assemblyai.com/v2/transcript/${transcript_id}`
+        const api_key: string = await read
+            .getEnvironmentReader()
+            .getSettings()
+            .getValueById("api-key");
+        var response = await http.get(reqUrl, {
+            headers: {
+                ["authorization"]: `${api_key}`,
+                ["content-type"]: "application/json",
+            },
+        });
+        const responseData = response.data
+        console.log("This is transcript data", response.data)
+        const { audio_url, text } = responseData
+        console.log({ audio_url, text })
+        const token = audio_url.split('token=')[1]
+        const payload = getPayload(token.split("&")[0])
 
-            const sender = await read.getUserReader().getAppUser(this.app.getID())
-            const { messageId } = payload.context
+        const sender = await read.getUserReader().getAppUser(this.app.getID())
+        const { messageId, rid, fileId } = payload.context
+        if (status === "completed") {
             updateSttMessage({ messageId, text, color: "#800080" }, sender!, modify)
+        } else {
+            // bug url/url/url need to slice the url to just get '/fileupload${fileID}-${filename}
+            updateSttMessage({ text: "Failed, try again !!", color: "#dc143c", messageId, button: true, buttonText: "ReQueue", buttonMessage: `/stt-queue ${rid} ${fileId} ${messageId} ${audio_url}` }, sender!, modify)
         }
+
     }
 
 }
