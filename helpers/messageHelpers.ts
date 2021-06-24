@@ -2,7 +2,7 @@ import { IModify } from "@rocket.chat/apps-engine/definition/accessors";
 import { MessageActionButtonsAlignment, MessageActionType } from "@rocket.chat/apps-engine/definition/messages";
 import { IRoom } from "@rocket.chat/apps-engine/definition/rooms";
 import { IUser } from "@rocket.chat/apps-engine/definition/users";
-import { removeSttAttachment } from "./attachmentHelpers";
+import { modifySttAttachment, removeSttAttachment } from "./attachmentHelpers";
 
 
 export const sendMessage = async (modify: IModify, room: IRoom, data) => {
@@ -29,29 +29,31 @@ export const sendMessage = async (modify: IModify, room: IRoom, data) => {
 
 export const updateSttMessage = async (data, sender: IUser, modify: IModify) => {
     try {
-        const { messageId, text, color, button = false, buttonText = "", buttonMessage = "" } = data
+        const { messageId } = data
         const messageUpdater = modify.getUpdater()
         let builder = await messageUpdater.message(messageId, sender!)
-        let attachments = builder.getAttachments()
-        attachments = removeSttAttachment(attachments)
+        // modifySttAttachment(data,sender,builder)
+        // let attachments = builder.getAttachments()
+        // attachments = removeSttAttachment(attachments)
 
-        builder.setAttachments([...attachments, {
-            title: { value: "SpeechToText" },
-            text,
-            color,
-            actionButtonsAlignment: MessageActionButtonsAlignment.HORIZONTAL,
-            actions: button === true ? [
-                {
-                    text: buttonText,
-                    type: MessageActionType.BUTTON,
-                    msg_in_chat_window: true,
-                    msg: buttonMessage,
-                },
-            ] : [],
-        }]).setEditor(sender)
+        // builder.setAttachments([...attachments, {
+        //     title: { value: "SpeechToText" },
+        //     text,
+        //     color,
+        //     actionButtonsAlignment: MessageActionButtonsAlignment.HORIZONTAL,
+        //     actions: button === true ? [
+        //         {
+        //             text: buttonText,
+        //             type: MessageActionType.BUTTON,
+        //             msg_in_chat_window: true,
+        //             msg: buttonMessage,
+        //         },
+        //     ] : [],
+        // }]).setEditor(sender)
+
 
         // sendMessage(modify, room, { text: "File Queued for transcription", userId: context.getSender().id })
-        await messageUpdater.finish(builder)
+        await messageUpdater.finish(modifySttAttachment(data, sender, builder))
     } catch (error) {
         console.log(error)
     }
