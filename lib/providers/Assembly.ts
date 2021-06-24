@@ -1,14 +1,26 @@
 import { IHttp, IRead, IModify } from "@rocket.chat/apps-engine/definition/accessors";
+import { IUser } from "@rocket.chat/apps-engine/definition/users";
 import { generateJWT, getPayload } from "../../helpers/jwtHelpers";
 import { sendMessage, updateSttMessage } from "../../helpers/messageHelpers";
+import { SpeechToTextApp } from "../../SpeechToTextApp";
 import { SttInterface } from "../interface/SttInterface";
 
 export class Assembly implements SttInterface {
 
-    public host = "http://23ad9d0b46a3.ngrok.io"
+    public sender: String
+
+    constructor(private readonly app: SpeechToTextApp) {
+        this.sender = this.app.getID()
+    }
+
+
+
+    public host = "http://98f908661ec4.ngrok.io"
+
+
 
     async queueAudio(data: any, http: IHttp, read: IRead, modify: IModify): Promise<void> {
-        console.log("QUeued for transcription")
+        // console.log("This is the PAPAPPAPAPAPA", this.sender)
         // destructure data
         const { rid, fileId, messageId, userId, audioUrl } = data;
         const api_key: string = await read
@@ -48,8 +60,8 @@ export class Assembly implements SttInterface {
             // do nothing
             console.log(response.data)
         } else {
-            const sender = await read.getUserReader().getById("rocket.cat");
-            updateSttMessage({ text: "Failed, try again !!", color: "#dc143c", messageId, button: true, buttonText: "ReQueue", buttonMessage: `/stt-queue ${rid} ${fileId} ${messageId} ${audioUrl}` }, sender, modify)
+            const sender = await read.getUserReader().getAppUser(this.app.getID())
+            updateSttMessage({ text: "Failed, try again !!", color: "#dc143c", messageId, button: true, buttonText: "ReQueue", buttonMessage: `/stt-queue ${rid} ${fileId} ${messageId} ${audioUrl}` }, sender!, modify)
 
         }
 
@@ -78,9 +90,9 @@ export class Assembly implements SttInterface {
             const token = audio_url.split('token=')[1]
             const payload = getPayload(token.split("&")[0])
 
-            const sender = await read.getUserReader().getById("rocket.cat");
+            const sender = await read.getUserReader().getAppUser(this.app.getID())
             const { messageId } = payload.context
-            updateSttMessage({ messageId, text, color: "#800080" }, sender, modify)
+            updateSttMessage({ messageId, text, color: "#800080" }, sender!, modify)
         }
     }
 

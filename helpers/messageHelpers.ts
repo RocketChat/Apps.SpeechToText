@@ -10,7 +10,7 @@ export const sendMessage = async (modify: IModify, room: IRoom, data) => {
     const message = await modify.getCreator().startMessage();
     message
         .setRoom(room)
-        .setEmojiAvatar(":stt:")
+        .setEmojiAvatar(":microphone2:")
         .setText(text)
         .setGroupable(false);
 

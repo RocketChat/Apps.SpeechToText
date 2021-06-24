@@ -29,7 +29,7 @@ export class SpeechToTextApp extends App implements IPreMessageSentExtend {
     public botName: string = "SpeechToText-BOT";
 
     //Avatar alias
-    public botAvatar: string = ":stt:";
+    public botAvatar: string = ":microphone2:";
 
     public provider
 
@@ -60,7 +60,7 @@ export class SpeechToTextApp extends App implements IPreMessageSentExtend {
         if (setting.id === "api-provider") {
             switch (setting.value) {
                 case "Assembly":
-                    this.provider = new Assembly()
+                    this.provider = new Assembly(this)
                     break;
             }
         }
@@ -77,7 +77,7 @@ export class SpeechToTextApp extends App implements IPreMessageSentExtend {
         const setting = await environmentRead.getSettings().getById("api-provider")
         switch (setting.value) {
             case "Assembly":
-                this.provider = new Assembly()
+                this.provider = new Assembly(this)
                 break;
         }
         return true;

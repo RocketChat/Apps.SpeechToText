@@ -35,13 +35,13 @@ export class QueueAudioCommand implements ISlashCommand {
         console.log("++++++++++++++")
         // Gettint the roomId and fileId from slash command arguments and userId from slash command context
         const [rid, fileId, messageId, audioUrl] = context.getArguments()
-        const sender = await read.getUserReader().getById("rocket.cat");
+        const sender = await read.getUserReader().getAppUser(this.app.getID())
         const room = context.getRoom()
 
 
         console.log({ rid, fileId, messageId, audioUrl, sender })
         // update status to queuing
-        updateSttMessage({ text: "File Queued for transcription", color: "#ffbf00", messageId, button: true, buttonText: "Queued.." }, sender, modify)
+        updateSttMessage({ text: "File Queued for transcription", color: "#ffbf00", messageId, button: true, buttonText: "Queued.." }, sender!, modify)
 
         const data = {
             rid, fileId, messageId, userId: context.getSender(), audioUrl
