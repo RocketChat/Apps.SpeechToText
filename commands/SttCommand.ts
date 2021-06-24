@@ -9,9 +9,7 @@ import {
     IPersistence,
 } from "@rocket.chat/apps-engine/definition/accessors";
 import { App } from "@rocket.chat/apps-engine/definition/App";
-import { MessageActionButtonsAlignment, MessageActionType } from "@rocket.chat/apps-engine/definition/messages";
-import { removeSttAttachment } from "../helpers/attachmentHelpers";
-import { sendMessage, updateSttMessage } from "../helpers/messageHelpers";
+import { updateSttMessage } from "../helpers/messageHelpers";
 import { SpeechToTextApp } from "../SpeechToTextApp";
 
 
@@ -47,8 +45,13 @@ export class QueueAudioCommand implements ISlashCommand {
             rid, fileId, messageId, userId: context.getSender(), audioUrl
         }
 
-        this.app.provider.queueAudio(data, http, read, modify)
+        const queued = await this.app.provider.queueAudio(data, http, read, modify)
+        console.log("QUUUUUUU", queued)
+        if (!queued) {
+            const sender = await read.getUserReader().getAppUser(this.app.getID())
+            updateSttMessage({ text: "Failed, try again !!", color: "#dc143c", messageId, button: true, buttonText: "ReQueue", buttonMessage: `/stt-queue ${rid} ${fileId} ${messageId} ${audioUrl}` }, sender!, modify)
 
+        }
 
 
         // try {

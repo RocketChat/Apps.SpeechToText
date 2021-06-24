@@ -13,13 +13,9 @@ export class Assembly implements SttInterface {
         this.sender = this.app.getID()
     }
 
+    public host = "http://c7467d412efa.ngrok.io"
 
-
-    public host = "http://98f908661ec4.ngrok.io"
-
-
-
-    async queueAudio(data: any, http: IHttp, read: IRead, modify: IModify): Promise<void> {
+    async queueAudio(data: any, http: IHttp, read: IRead, modify: IModify): Promise<Boolean> {
         // console.log("This is the PAPAPPAPAPAPA", this.sender)
         // destructure data
         const { rid, fileId, messageId, userId, audioUrl } = data;
@@ -57,13 +53,9 @@ export class Assembly implements SttInterface {
             },
         });
         if (response && response.data.status === "queued") {
-            // do nothing
-            console.log(response.data)
-        } else {
-            const sender = await read.getUserReader().getAppUser(this.app.getID())
-            updateSttMessage({ text: "Failed, try again !!", color: "#dc143c", messageId, button: true, buttonText: "ReQueue", buttonMessage: `/stt-queue ${rid} ${fileId} ${messageId} ${audioUrl}` }, sender!, modify)
-
+            return true
         }
+        return false
 
     }
 
