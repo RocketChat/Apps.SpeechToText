@@ -88,6 +88,7 @@ export class Assembly implements SttInterface {
             updateSttMessage({ messageId, text, color: "#800080" }, sender!, modify)
         } else {
             // bug url/url/url need to slice the url to just get '/fileupload${fileID}-${filename}
+            // bug fix
             updateSttMessage({ text: "Failed, try again !!", color: "#dc143c", messageId, button: true, buttonText: "ReQueue", buttonMessage: `/stt-queue ${rid} ${fileId} ${messageId} ${payload.context.audioUrl}` }, sender!, modify)
         }
 
