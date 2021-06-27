@@ -13,7 +13,7 @@ export class Assembly implements SttInterface {
         this.sender = this.app.getID()
     }
 
-    public host = "http://c7467d412efa.ngrok.io"
+    public host = "https://87cbd8ba0500.ngrok.io"
 
     async queueAudio(data: any, http: IHttp, read: IRead, modify: IModify): Promise<Boolean> {
         // console.log("This is the PAPAPPAPAPAPA", this.sender)
@@ -36,6 +36,7 @@ export class Assembly implements SttInterface {
             userId,
             fileId,
             messageId,
+            audioUrl
         }, jwt_secret)
         // Appending the JWT token to audioURL and getting the final recording URL which is to be sent to the provider
         let recordingUrl = `${this.host}${audioUrl}?token=${jwtToken}`;
@@ -87,7 +88,7 @@ export class Assembly implements SttInterface {
             updateSttMessage({ messageId, text, color: "#800080" }, sender!, modify)
         } else {
             // bug url/url/url need to slice the url to just get '/fileupload${fileID}-${filename}
-            updateSttMessage({ text: "Failed, try again !!", color: "#dc143c", messageId, button: true, buttonText: "ReQueue", buttonMessage: `/stt-queue ${rid} ${fileId} ${messageId} ${audio_url}` }, sender!, modify)
+            updateSttMessage({ text: "Failed, try again !!", color: "#dc143c", messageId, button: true, buttonText: "ReQueue", buttonMessage: `/stt-queue ${rid} ${fileId} ${messageId} ${payload.context.audioUrl}` }, sender!, modify)
         }
 
     }
