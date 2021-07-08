@@ -5,6 +5,7 @@ export enum AppSetting {
     API_KEY = 'api-key',
     JWT_SECRET = 'jwt-secret',
     ASSEMBLY = 'Assembly',
+    MICROSOFT = 'Microsoft',
     REV = 'Rev',
     GOOGLE = 'Google'
 }
@@ -23,6 +24,10 @@ export const settings: Array<ISetting> = [
             {
                 key: AppSetting.ASSEMBLY,
                 i18nLabel: "Assembly AI",
+            },
+            {
+                key: AppSetting.MICROSOFT,
+                i18nLabel: "Microsoft Cognitive",
             }
         ],
     },
