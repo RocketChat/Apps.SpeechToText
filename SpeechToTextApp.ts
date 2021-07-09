@@ -15,12 +15,13 @@ import { IMessage, IPreMessageSentExtend, MessageActionButtonsAlignment, Message
 import { IAppInfo } from '@rocket.chat/apps-engine/definition/metadata';
 import { ISetting } from '@rocket.chat/apps-engine/definition/settings';
 import { QueueAudioCommand } from './commands/SttCommand';
-import { settings } from './config/Setting';
+import { AppSetting, settings } from './config/Setting';
 import { webhookEndpoint } from './endpoints/webhookEndpoint';
 import { getAudioAttachment, isAudio } from './helpers/attachmentHelpers';
 import { sendMessage } from './helpers/messageHelpers';
 import { SttInterface } from './lib/interface/SttInterface';
 import { Assembly } from './lib/providers/Assembly';
+import { Microsoft } from './lib/providers/Microsoft';
 
 export class SpeechToTextApp extends App implements IPreMessageSentExtend {
 
@@ -59,8 +60,12 @@ export class SpeechToTextApp extends App implements IPreMessageSentExtend {
     ): Promise<void> {
         if (setting.id === "api-provider") {
             switch (setting.value) {
-                case "Assembly":
+                case AppSetting.ASSEMBLY:
                     this.provider = new Assembly(this)
+                    break;
+                case AppSetting.MICROSOFT:
+                    this.provider = new Microsoft(this)
+                    this.provider.registerWebhook(http, read)
                     break;
             }
         }
@@ -76,8 +81,11 @@ export class SpeechToTextApp extends App implements IPreMessageSentExtend {
     ): Promise<boolean> {
         const setting = await environmentRead.getSettings().getById("api-provider")
         switch (setting.value) {
-            case "Assembly":
+            case AppSetting.ASSEMBLY:
                 this.provider = new Assembly(this)
+                break;
+            case AppSetting.MICROSOFT:
+                this.provider = new Microsoft(this)
                 break;
         }
         return true;
