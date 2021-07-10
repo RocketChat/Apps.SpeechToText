@@ -16,10 +16,23 @@ export class Microsoft implements SttInterface {
         // this.app.
     }
     handleWebhook(success: any, request: IApiRequest, http: IHttp, read: IRead, modify: IModify): Promise<IApiResponse> {
-        throw new Error("Method not implemented.");
+        console.log('======>>>webhook', request.content)
+
+        if (request.headers['x-microsoftspeechservices-event'] === "Challenge") {
+            const { validationToken } = request.query
+            console.log(request.content)
+            return success(validationToken)
+
+        }
+
+        const { self } = request.content
+        this.getTranscript({}, http, read, modify)
+        console.log(request.content)
+        console.log("Transcription complete!!!!")
+        return success()
     }
 
-    public host = "http://687eebbb7fb7.ngrok.io"
+    public host = "https://02b85b5b675e.ngrok.io"
 
     async registerWebhook(http: IHttp, read: IRead): Promise<void> {
 
@@ -33,7 +46,7 @@ export class Microsoft implements SttInterface {
 
         const [webhook] = this.app.getAccessors().providedApiEndpoints.filter((endpoint) => endpoint.path === 'stt-webhook');
 
-        const webUrl = `${this.host}/${webhook.computedPath}`
+        const webUrl = `${this.host}${webhook.computedPath}`
         let response = await http.post(reqUrl, {
             data: {
                 "displayName": "TranscriptionCompletionWebHook",
@@ -49,10 +62,11 @@ export class Microsoft implements SttInterface {
                 ["content-type"]: "application/json",
             },
         });
+
+        console.log(response.content)
     }
 
     async queueAudio(data: any, http: IHttp, read: IRead, modify: IModify): Promise<Boolean> {
-        console.log("Audio queue function running")
         return true
     }
 
