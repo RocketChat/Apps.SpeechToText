@@ -65,7 +65,6 @@ export class SpeechToTextApp extends App implements IPreMessageSentExtend {
                     break;
                 case AppSetting.MICROSOFT:
                     this.provider = new Microsoft(this)
-                    this.provider.registerWebhook(http, read)
                     break;
             }
         }

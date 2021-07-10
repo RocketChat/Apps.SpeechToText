@@ -28,7 +28,6 @@ export class webhookEndpoint extends ApiEndpoint {
         http: IHttp,
         persis: IPersistence
     ): Promise<IApiResponse> {
-        await this.app.provider.getTranscript(request.content, http, read, modify)
-        return this.success();
+        return await this.app.provider.handleWebhook(this.success, request, http, read, modify)
     }
 }

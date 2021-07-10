@@ -1,4 +1,5 @@
 import { IHttp, IRead, IModify } from "@rocket.chat/apps-engine/definition/accessors";
+import { IApi, IApiRequest, IApiResponse } from "@rocket.chat/apps-engine/definition/api";
 import { IUser } from "@rocket.chat/apps-engine/definition/users";
 import { generateJWT, getPayload } from "../../helpers/jwtHelpers";
 import { sendMessage, updateSttMessage } from "../../helpers/messageHelpers";
@@ -13,7 +14,12 @@ export class Assembly implements SttInterface {
         this.sender = this.app.getID()
     }
 
-    public host = "https://87cbd8ba0500.ngrok.io"
+    public host = "https://2b9ace0860bf.ngrok.io"
+
+    async handleWebhook(success, request: IApiRequest, http: IHttp, read: IRead, modify: IModify): Promise<IApiResponse> {
+        await this.getTranscript(request.content, http, read, modify)
+        return success();
+    }
 
     async queueAudio(data: any, http: IHttp, read: IRead, modify: IModify): Promise<Boolean> {
         // console.log("This is the PAPAPPAPAPAPA", this.sender)
@@ -85,6 +91,7 @@ export class Assembly implements SttInterface {
         const sender = await read.getUserReader().getAppUser(this.app.getID())
         const { messageId, rid, fileId } = payload.context
         if (status === "completed") {
+            console.log({ messageId, text, color: "#800080" })
             updateSttMessage({ messageId, text, color: "#800080" }, sender!, modify)
         } else {
             // bug url/url/url need to slice the url to just get '/fileupload${fileID}-${filename}
