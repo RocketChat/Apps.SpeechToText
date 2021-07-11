@@ -10,7 +10,7 @@ export class Microsoft implements SttInterface {
 
     public sender: String
 
-    public host = "https://4a80de032135.ngrok.io"
+    public host = "https://ca246b10dcc9.ngrok.io"
 
     constructor(private readonly app: SpeechToTextApp) {
         this.sender = this.app.getID()
@@ -141,7 +141,22 @@ export class Microsoft implements SttInterface {
         })
 
         const { contentUrl } = transcript.links
-        console.log("Now getting the transcsript", contentUrl)
+        const content = await http.get(`${contentUrl}`, {
+            headers: {},
+        });
+
+        const [text] = content && content.data.combinedRecognizedPhrases
+
+        const { source } = content.data
+        const audio_url = source
+        const token = audio_url.split('token=')[1]
+        const payload = getPayload(token.split("&")[0])
+
+        const sender = await read.getUserReader().getAppUser(this.app.getID())
+        const { messageId, rid, fileId } = payload.context
+        updateSttMessage({ messageId, text: text.display, color: "#800080" }, sender!, modify)
+
+        console.log("Now getting the transcsript", text.display)
     }
 
 }

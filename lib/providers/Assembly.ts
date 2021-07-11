@@ -82,7 +82,6 @@ export class Assembly implements SttInterface {
             },
         });
         const responseData = response.data
-        console.log("This is transcript data", response.data)
         const { audio_url, text } = responseData
         console.log({ audio_url, text })
         const token = audio_url.split('token=')[1]
