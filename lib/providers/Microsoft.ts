@@ -10,6 +10,7 @@ export class Microsoft implements SttInterface {
 
     public sender: String
 
+    public host = "https://4a80de032135.ngrok.io"
 
     constructor(private readonly app: SpeechToTextApp) {
         this.sender = this.app.getID()
@@ -25,14 +26,10 @@ export class Microsoft implements SttInterface {
 
         }
 
-        const { self } = request.content
-        this.getTranscript({}, http, read, modify)
-        console.log(request.content)
-        console.log("Transcription complete!!!!")
+        this.getTranscript(request.content, http, read, modify)
         return success()
     }
 
-    public host = "https://02b85b5b675e.ngrok.io"
 
     async registerWebhook(http: IHttp, read: IRead): Promise<void> {
 
@@ -67,12 +64,84 @@ export class Microsoft implements SttInterface {
     }
 
     async queueAudio(data: any, http: IHttp, read: IRead, modify: IModify): Promise<Boolean> {
-        return true
+
+        const { rid, fileId, messageId, userId, audioUrl } = data;
+        const api_key: string = await read
+            .getEnvironmentReader()
+            .getSettings()
+            .getValueById("api-key");
+        const jwt_secret: string = await read
+            .getEnvironmentReader()
+            .getSettings()
+            .getValueById("jwt-secret");
+
+        let jwtToken = generateJWT({
+            typ: 'JWT',
+            alg: 'HS256',
+        }, {
+            rid,
+            userId,
+            fileId,
+            messageId,
+            audioUrl
+        }, jwt_secret)
+        // Appending the JWT token to audioURL and getting the final recording URL which is to be sent to the provider
+        let recordingUrl = `${this.host}${audioUrl}?token=${jwtToken}`;
+        let reqUrl = "https://eastus.api.cognitive.microsoft.com/speechtotext/v3.0/transcriptions";
+
+        let response = await http.post(reqUrl, {
+            data: {
+                "contentUrls": [
+                    recordingUrl,
+
+                ],
+                "properties": {
+                    "wordLevelTimestampsEnabled": true
+                },
+                "locale": "en-US",
+                "displayName": "Transcription of file using default model for en-US"
+            },
+            headers: {
+                ["Ocp-Apim-Subscription-Key"]: `${api_key}`,
+                ["content-type"]: "application/json",
+            },
+        });
+
+        if (response && response.data.status) {
+            return true
+        } else {
+            return false
+        }
     }
 
 
     async getTranscript(data: any, http: IHttp, read: IRead, modify: IModify): Promise<void> {
-        console.log("Now getting the transcsript")
+
+        const { self } = data
+        const api_key: string = await read
+            .getEnvironmentReader()
+            .getSettings()
+            .getValueById("api-key");
+
+        const files = await http.get(`${self}/files`, {
+            headers: {
+                ["Ocp-Apim-Subscription-Key"]: `${api_key}`,
+            },
+        });
+
+        // console.log(transcript.content)
+
+        // const file = await http.get(transcript.content!, {
+        //     headers: {
+        //         ["Ocp-Apim-Subscription-Key"]: `${api_key}`,
+        //     },
+        // });
+        const [transcript] = files.data.values.filter(value => {
+            return value.kind === "Transcription"
+        })
+
+        const { contentUrl } = transcript.links
+        console.log("Now getting the transcsript", contentUrl)
     }
 
 }
