@@ -71,6 +71,42 @@ export class Rev implements SttInterface {
         const { job } = data
         console.log("this is the fucking job", job)
         console.log('this function gets the trancript')
+        const { id, media_url } = job
+        console.log(job)
+        const reqUrl = `https://api.rev.ai/speechtotext/v1/jobs/${id}/transcript`
+        const api_key: string = await read
+            .getEnvironmentReader()
+            .getSettings()
+            .getValueById("api-key");
+        console.log(reqUrl, api_key)
+
+        try {
+            var response = await http.get(reqUrl, {
+                headers: {
+                    ["Authorization"]: `Bearer ${api_key}`
+                },
+            });
+            const responseData = response.content
+            console.log(responseData)
+        } catch (err) {
+            console.log(err)
+        }
+        // const { audio_url, text } = responseData
+        // console.log({ audio_url, text })
+        // const token = audio_url.split('token=')[1]
+        // const payload = getPayload(token.split("&")[0])
+
+        // const sender = await read.getUserReader().getAppUser(this.app.getID())
+        // const { messageId, rid, fileId } = payload.context
+        // if (status === "completed") {
+        //     console.log({ messageId, text, color: "#800080" })
+        //     updateSttMessage({ messageId, text, color: "#800080" }, sender!, modify)
+        // } else {
+        //     // bug url/url/url need to slice the url to just get '/fileupload${fileID}-${filename}
+        //     // bug fix
+        //     updateSttMessage({ text: "Failed, try again !!", color: "#dc143c", messageId, button: true, buttonText: "ReQueue", buttonMessage: `/stt-queue ${rid} ${fileId} ${messageId} ${payload.context.audioUrl}` }, sender!, modify)
+        // }
+
 
     }
 
