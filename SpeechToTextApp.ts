@@ -22,6 +22,7 @@ import { sendMessage } from './helpers/messageHelpers';
 import { SttInterface } from './lib/interface/SttInterface';
 import { Assembly } from './lib/providers/Assembly';
 import { Microsoft } from './lib/providers/Microsoft';
+import { Rev } from './lib/providers/Rev';
 
 export class SpeechToTextApp extends App implements IPreMessageSentExtend {
 
@@ -33,11 +34,6 @@ export class SpeechToTextApp extends App implements IPreMessageSentExtend {
     public botAvatar: string = ":microphone2:";
 
     public provider
-
-
-    public readonly Assembly: Assembly
-
-
 
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
         super(info, logger, accessors);
@@ -67,6 +63,9 @@ export class SpeechToTextApp extends App implements IPreMessageSentExtend {
                     this.provider = new Microsoft(this)
                     this.provider.registerWebhook(http, read)
                     break;
+                case AppSetting.REV:
+                    this.provider = new Rev(this)
+                    break;
             }
         }
     }
@@ -86,6 +85,9 @@ export class SpeechToTextApp extends App implements IPreMessageSentExtend {
                 break;
             case AppSetting.MICROSOFT:
                 this.provider = new Microsoft(this)
+                break;
+            case AppSetting.REV:
+                this.provider = new Rev(this)
                 break;
         }
         return true;
