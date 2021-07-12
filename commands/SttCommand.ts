@@ -30,7 +30,6 @@ export class QueueAudioCommand implements ISlashCommand {
         http: IHttp,
         persistence: IPersistence
     ): Promise<void> {
-        console.log("++++++++++++++")
         // Gettint the roomId and fileId from slash command arguments and userId from slash command context
         const [rid, fileId, messageId, audioUrl] = context.getArguments()
         const sender = await read.getUserReader().getAppUser(this.app.getID())
