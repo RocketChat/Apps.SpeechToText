@@ -10,18 +10,16 @@ export class Microsoft implements SttInterface {
 
     public sender: String
 
-    public host = "https://ca246b10dcc9.ngrok.io"
+    public host = "https://86a2b37c2ef9.ngrok.io"
 
     constructor(private readonly app: SpeechToTextApp) {
         this.sender = this.app.getID()
         // this.app.
     }
     handleWebhook(success: any, request: IApiRequest, http: IHttp, read: IRead, modify: IModify): Promise<IApiResponse> {
-        console.log('======>>>webhook', request.content)
 
         if (request.headers['x-microsoftspeechservices-event'] === "Challenge") {
             const { validationToken } = request.query
-            console.log(request.content)
             return success(validationToken)
 
         }
@@ -38,7 +36,6 @@ export class Microsoft implements SttInterface {
             .getSettings()
             .getValueById("api-key");
 
-        console.log("This functions is gonna setup the webhook")
         const reqUrl = "https://eastus.api.cognitive.microsoft.com/speechtotext/v3.0/webhooks"
 
         const [webhook] = this.app.getAccessors().providedApiEndpoints.filter((endpoint) => endpoint.path === 'stt-webhook');
@@ -60,7 +57,6 @@ export class Microsoft implements SttInterface {
             },
         });
 
-        console.log(response.content)
     }
 
     async queueAudio(data: any, http: IHttp, read: IRead, modify: IModify): Promise<Boolean> {
@@ -156,7 +152,6 @@ export class Microsoft implements SttInterface {
         const { messageId, rid, fileId } = payload.context
         updateSttMessage({ messageId, text: text.display, color: "#800080" }, sender!, modify)
 
-        console.log("Now getting the transcsript", text.display)
     }
 
 }

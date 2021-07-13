@@ -48,6 +48,5 @@ export const getPayload = (jwt) => {
     const splittedToken = jwt.split('.')
     let buf = Buffer.from(splittedToken[1], 'base64');
     let payload = JSON.parse(buf.toString());
-    console.log(payload)
     return payload
 }

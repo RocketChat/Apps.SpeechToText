@@ -69,16 +69,15 @@ export class Rev implements SttInterface {
 
     async getTranscript(data: any, http: IHttp, read: IRead, modify: IModify): Promise<void> {
         const { job } = data
-        console.log("this is the fucking job", job)
-        console.log('this function gets the trancript')
+
         const { id, media_url } = job
-        console.log(job)
+
         const reqUrl = `https://api.rev.ai/speechtotext/v1/jobs/${id}/transcript`
         const api_key: string = await read
             .getEnvironmentReader()
             .getSettings()
             .getValueById("api-key");
-        console.log(reqUrl, api_key)
+
 
         try {
             var response = await http.get(reqUrl, {
@@ -87,9 +86,9 @@ export class Rev implements SttInterface {
                 },
             });
             const responseData = response.content
-            console.log(responseData)
+
         } catch (err) {
-            console.log(err)
+
         }
         // const { audio_url, text } = responseData
         // console.log({ audio_url, text })

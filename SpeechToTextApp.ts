@@ -164,7 +164,7 @@ export class SpeechToTextApp extends App implements IPreMessageSentExtend {
                 ],
             })
         } else {
-            console.log("Settings not provided")
+            // console.log("Settings not provided")
         }
 
 
