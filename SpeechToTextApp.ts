@@ -33,6 +33,8 @@ export class SpeechToTextApp extends App implements IPreMessageSentExtend {
     //Avatar alias
     public botAvatar: string = ":microphone2:";
 
+    public webhook_url: string
+
     public provider
 
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
@@ -78,6 +80,11 @@ export class SpeechToTextApp extends App implements IPreMessageSentExtend {
         environmentRead: IEnvironmentRead,
         configModify: IConfigurationModify
     ): Promise<boolean> {
+        console.log("APP JUST STARTED BITCHHH--")
+        const siteUrl = await environmentRead.getServerSettings().getValueById('Site_Url');
+        const [webhook] = this.getAccessors().providedApiEndpoints.filter((endpoint) => endpoint.path === 'stt-webhook')
+        console.log("siteurl", siteUrl, webhook.computedPath)
+
         const setting = await environmentRead.getSettings().getById("api-provider")
         switch (setting.value) {
             case AppSetting.ASSEMBLY:
