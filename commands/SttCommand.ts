@@ -8,8 +8,7 @@ import {
     IRead,
     IPersistence,
 } from "@rocket.chat/apps-engine/definition/accessors";
-import { App } from "@rocket.chat/apps-engine/definition/App";
-import { updateSttMessage } from "../helpers/messageHelpers";
+import { notifyUser, updateSttMessage } from "../helpers/messageHelpers";
 import { SpeechToTextApp } from "../SpeechToTextApp";
 
 
@@ -30,46 +29,56 @@ export class QueueAudioCommand implements ISlashCommand {
         http: IHttp,
         persistence: IPersistence
     ): Promise<void> {
-        // Gettint the roomId and fileId from slash command arguments and userId from slash command context
-        const [rid, fileId, messageId, audioUrl] = context.getArguments()
-        const sender = await read.getUserReader().getAppUser(this.app.getID())
+
+        const api_key: string = await read
+            .getEnvironmentReader()
+            .getSettings()
+            .getValueById("api-key");
+        const api_provider: string = await read
+            .getEnvironmentReader()
+            .getSettings()
+            .getValueById("api-provider");
+        const jwt_secret: string = await read
+            .getEnvironmentReader()
+            .getSettings()
+            .getValueById("jwt-secret");
+        // const tunnel: string = await read
+        //     .getEnvironmentReader()
+        //     .getSettings()
+        //     .getValueById("jw");
+        // console.log(tunnel)
+
+        const user = context.getSender()
         const room = context.getRoom()
 
+        const settings_provided = !!api_key && !!api_provider && !!jwt_secret
 
-        // console.log({ rid, fileId, messageId, audioUrl, sender })
-        // update status to queuing
-        updateSttMessage({ text: "File Queued for transcription", color: "#ffbf00", messageId, button: true, buttonText: "Queued.." }, sender!, modify)
+        if (settings_provided) {
+            // console.log(this.app.webhook_url)
 
-        const data = {
-            rid, fileId, messageId, userId: context.getSender(), audioUrl
+            const [rid, fileId, messageId, audioUrl] = context.getArguments()
+            const botUser = await read.getUserReader().getAppUser(this.app.getID())
+
+            updateSttMessage({ text: "Queuing file for transcription", color: "#ffbf00", messageId, button: true, buttonText: "Queued.." }, botUser!, modify)
+
+            console.log(audioUrl)
+
+            const data = {
+                rid, fileId, messageId, userId: context.getSender(), audioUrl
+            }
+
+            const queued = await this.app.provider.queueAudio(data, http, read, modify)
+
+            if (queued.status === false) {
+                updateSttMessage({ text: queued.message, color: "#dc143c", messageId, button: true, buttonText: "ReQueue", buttonMessage: `/stt-queue ${rid} ${fileId} ${messageId} ${audioUrl}` }, botUser!, modify)
+            } else {
+                updateSttMessage({ text: queued.message, color: "#2BE0A5", messageId, button: true, buttonText: "Queued" }, botUser!, modify)
+            }
+
+        } else {
+            await notifyUser(this.app, user, modify, room, "User settings missing!!! Please provide all user settings")
         }
 
-        const queued = await this.app.provider.queueAudio(data, http, read, modify)
-        if (!queued) {
-            const sender = await read.getUserReader().getAppUser(this.app.getID())
-            updateSttMessage({ text: "Failed, try again !!", color: "#dc143c", messageId, button: true, buttonText: "ReQueue", buttonMessage: `/stt-queue ${rid} ${fileId} ${messageId} ${audioUrl}` }, sender!, modify)
-
-        }
-
-
-        // try {
-        //     const messageUpdater = modify.getUpdater()
-        //     let builder = await messageUpdater.message(messageId, sender!)
-        //     let attachments = builder.getAttachments()
-        //     attachments = removeSttAttachment(attachments)
-
-        //     builder.setAttachments([...attachments, {
-        //         title: { value: "SpeechToText" },
-        //         text: "File queued for transcription",
-        //         color: "#ffbf00",
-
-        //     }]).setEditor(sender)
-
-        //     // sendMessage(modify, room, { text: "File Queued for transcription", userId: context.getSender().id })
-        //     await messageUpdater.finish(builder)
-        // } catch (error) {
-        //     console.log(error)
-        // }
-
+        // console.log({ api_key, api_provider, jwt_secret })
     }
 }
