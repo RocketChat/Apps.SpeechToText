@@ -22,7 +22,6 @@ export class Assembly implements SttInterface {
     }
 
     async queueAudio(data: any, http: IHttp, read: IRead, modify: IModify): Promise<Boolean> {
-        // console.log("This is the PAPAPPAPAPAPA", this.sender)
         // destructure data
         const { rid, fileId, messageId, userId, audioUrl } = data;
         const api_key: string = await read

@@ -29,7 +29,6 @@ export class SpeechToTextApp extends App implements IPreMessageSentExtend {
 
     // username alias
     public botName: string = "SpeechToText-BOT";
-
     //Avatar alias
     public botAvatar: string = ":microphone2:";
 
@@ -80,10 +79,8 @@ export class SpeechToTextApp extends App implements IPreMessageSentExtend {
         environmentRead: IEnvironmentRead,
         configModify: IConfigurationModify
     ): Promise<boolean> {
-        console.log("APP JUST STARTED BITCHHH--")
         const siteUrl = await environmentRead.getServerSettings().getValueById('Site_Url');
         const [webhook] = this.getAccessors().providedApiEndpoints.filter((endpoint) => endpoint.path === 'stt-webhook')
-        console.log("siteurl", siteUrl, webhook.computedPath)
 
         const setting = await environmentRead.getSettings().getById("api-provider")
         switch (setting.value) {
@@ -126,7 +123,8 @@ export class SpeechToTextApp extends App implements IPreMessageSentExtend {
         http: IHttp
     ): Promise<boolean> {
 
-        return isAudio(message)
+        // return isAudio(message)
+        return true
 
     }
 
@@ -172,6 +170,7 @@ export class SpeechToTextApp extends App implements IPreMessageSentExtend {
             })
         } else {
             // console.log("Settings not provided")
+            // sendMessage(modify, message.room.id, { message: "HIHI" })
         }
 
 

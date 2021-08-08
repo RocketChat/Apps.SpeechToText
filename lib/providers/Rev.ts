@@ -23,7 +23,6 @@ export class Rev implements SttInterface {
 
 
     async queueAudio(data: any, http: IHttp, read: IRead, modify: IModify): Promise<Boolean> {
-        // console.log("This is the PAPAPPAPAPAPA", this.sender)
         // destructure data
         const { rid, fileId, messageId, userId, audioUrl } = data;
         const api_key: string = await read
@@ -90,23 +89,6 @@ export class Rev implements SttInterface {
         } catch (err) {
 
         }
-        // const { audio_url, text } = responseData
-        // console.log({ audio_url, text })
-        // const token = audio_url.split('token=')[1]
-        // const payload = getPayload(token.split("&")[0])
-
-        // const sender = await read.getUserReader().getAppUser(this.app.getID())
-        // const { messageId, rid, fileId } = payload.context
-        // if (status === "completed") {
-        //     console.log({ messageId, text, color: "#800080" })
-        //     updateSttMessage({ messageId, text, color: "#800080" }, sender!, modify)
-        // } else {
-        //     // bug url/url/url need to slice the url to just get '/fileupload${fileID}-${filename}
-        //     // bug fix
-        //     updateSttMessage({ text: "Failed, try again !!", color: "#dc143c", messageId, button: true, buttonText: "ReQueue", buttonMessage: `/stt-queue ${rid} ${fileId} ${messageId} ${payload.context.audioUrl}` }, sender!, modify)
-        // }
-
-
     }
 
 }

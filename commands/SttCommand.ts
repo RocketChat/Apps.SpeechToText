@@ -45,7 +45,6 @@ export class QueueAudioCommand implements ISlashCommand {
         }
 
         const queued = await this.app.provider.queueAudio(data, http, read, modify)
-        console.log("QUUUUUUU", queued)
         if (!queued) {
             const sender = await read.getUserReader().getAppUser(this.app.getID())
             updateSttMessage({ text: "Failed, try again !!", color: "#dc143c", messageId, button: true, buttonText: "ReQueue", buttonMessage: `/stt-queue ${rid} ${fileId} ${messageId} ${audioUrl}` }, sender!, modify)

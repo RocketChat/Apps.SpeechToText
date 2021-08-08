@@ -15,7 +15,6 @@ export const sendMessage = async (modify: IModify, room: IRoom, data) => {
         .setGroupable(false);
 
 
-    // console.log("MESSAGE HA YE", message)
     // if (room.type !== "l") {
     //     // do nothing
     //     await modify
