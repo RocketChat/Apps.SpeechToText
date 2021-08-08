@@ -17,8 +17,6 @@ export class Assembly implements SttInterface {
     }
 
     async queueAudio(data: any, http: IHttp, read: IRead): Promise<{ status: Boolean; message: String }> {
-        // console.log("This is the PAPAPPAPAPAPA", this.sender)
-        // destructure data
         const { rid, fileId, messageId, userId, audioUrl } = data;
         const api_key: string = await read
             .getEnvironmentReader()
@@ -68,16 +66,12 @@ export class Assembly implements SttInterface {
             .getEnvironmentReader()
             .getSettings()
             .getValueById("api-key");
-        // console.log(data)
         var response = await http.get(reqUrl, {
             headers: {
                 ["authorization"]: `${api_key}`,
                 ["content-type"]: "application/json",
             },
         });
-        // const responseData = response.data
-        // const {status} = response.data
-        // console.log(response.data)
         const { audio_url, text, status, error } = response.data
 
         const token = audio_url.split('token=')[1]

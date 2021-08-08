@@ -42,11 +42,6 @@ export class QueueAudioCommand implements ISlashCommand {
             .getEnvironmentReader()
             .getSettings()
             .getValueById("jwt-secret");
-        // const tunnel: string = await read
-        //     .getEnvironmentReader()
-        //     .getSettings()
-        //     .getValueById("jw");
-        // console.log(tunnel)
 
         const user = context.getSender()
         const room = context.getRoom()
@@ -54,14 +49,10 @@ export class QueueAudioCommand implements ISlashCommand {
         const settings_provided = !!api_key && !!api_provider && !!jwt_secret
 
         if (settings_provided) {
-            // console.log(this.app.webhook_url)
-
             const [rid, fileId, messageId, audioUrl] = context.getArguments()
             const botUser = await read.getUserReader().getAppUser(this.app.getID())
 
             updateSttMessage({ text: "Queuing file for transcription", color: "#ffbf00", messageId, button: true, buttonText: "Queued.." }, botUser!, modify)
-
-            console.log(audioUrl)
 
             const data = {
                 rid, fileId, messageId, userId: context.getSender(), audioUrl
@@ -79,6 +70,5 @@ export class QueueAudioCommand implements ISlashCommand {
             await notifyUser(this.app, user, modify, room, "User settings missing!!! Please provide all user settings")
         }
 
-        // console.log({ api_key, api_provider, jwt_secret })
     }
 }

@@ -110,22 +110,18 @@ export class Microsoft implements SttInterface {
 
 
     async getTranscript(data: any, http: IHttp, read: IRead, modify: IModify): Promise<void> {
-        console.log("NOW RUNNING GET TRANSCRIPT")
         const { self } = data
         const api_key: string = await read
             .getEnvironmentReader()
             .getSettings()
             .getValueById("api-key");
-        const [key, location] = api_key.split(' ')
-        console.log(self)
+        const [key] = api_key.split(' ')
 
         const files = await http.get(`${self}/files`, {
             headers: {
                 ["Ocp-Apim-Subscription-Key"]: `${key}`,
             },
         });
-        // console.log('----------------------')
-        // console.log(files.data)
 
         const [transcript] = files.data.values.filter(value => {
             return value.kind === "Transcription"
@@ -165,9 +161,7 @@ export class Microsoft implements SttInterface {
 
                 const token = details.source.split('token=')[1]
                 const payload = getPayload(token.split("&")[0])
-                console.log(payload.context)
                 const { messageId, rid, fileId, audio_url } = payload.context
-                console.log({ rid, messageId, fileId, audio_url })
 
                 updateSttMessage({ text: "Transcription failed !! Maybe Check your JWT", color: "#dc143c", messageId, button: true, buttonText: "ReQueue", buttonMessage: `/stt-queue ${rid} ${fileId} ${messageId} ${payload.context.audioUrl}` }, botUser!, modify)
             } catch (error) {
