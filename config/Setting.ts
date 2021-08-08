@@ -40,7 +40,7 @@ export const settings: Array<ISetting> = [
     {
         id: AppSetting.API_KEY,
         i18nLabel: "API Key",
-        i18nDescription: "Provide your API key here",
+        i18nDescription: "Provide your API key here *(For MicrosoftCognitiveServices you need to also provide your region seperated by space from the api-key)",
         required: true,
         type: SettingType.STRING,
         public: true,
