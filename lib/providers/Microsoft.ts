@@ -169,7 +169,7 @@ export class Microsoft implements SttInterface {
                 const { messageId, rid, fileId, audio_url } = payload.context
                 console.log({ rid, messageId, fileId, audio_url })
 
-                updateSttMessage({ text: "Transcription failed !! ", color: "#dc143c", messageId, button: true, buttonText: "ReQueue", buttonMessage: `/stt-queue ${rid} ${fileId} ${messageId} ${payload.context.audioUrl}` }, botUser!, modify)
+                updateSttMessage({ text: "Transcription failed !! Maybe Check your JWT", color: "#dc143c", messageId, button: true, buttonText: "ReQueue", buttonMessage: `/stt-queue ${rid} ${fileId} ${messageId} ${payload.context.audioUrl}` }, botUser!, modify)
             } catch (error) {
                 console.log(error)
             }

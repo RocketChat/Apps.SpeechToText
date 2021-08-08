@@ -30,11 +30,11 @@ export const settings: Array<ISetting> = [
                 key: AppSetting.MICROSOFT,
                 i18nLabel: "Microsoft Cognitive",
             }
-            ,
-            {
-                key: AppSetting.REV,
-                i18nLabel: "Rev.AI",
-            }
+            // ,
+            // {
+            //     key: AppSetting.REV,
+            //     i18nLabel: "Rev.AI",
+            // }
         ],
     },
     {
