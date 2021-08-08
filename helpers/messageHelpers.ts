@@ -1,29 +1,30 @@
 import { IModify } from "@rocket.chat/apps-engine/definition/accessors";
-import { MessageActionButtonsAlignment, MessageActionType } from "@rocket.chat/apps-engine/definition/messages";
 import { IRoom } from "@rocket.chat/apps-engine/definition/rooms";
 import { IUser } from "@rocket.chat/apps-engine/definition/users";
-import { modifySttAttachment, removeSttAttachment } from "./attachmentHelpers";
+import { SpeechToTextApp } from "../SpeechToTextApp";
+import { modifySttAttachment } from "./attachmentHelpers";
 
+export async function notifyUser(app: SpeechToTextApp, user: IUser, modify: IModify, room: IRoom, message: string): Promise<void> {
 
-export const sendMessage = async (modify: IModify, room: IRoom, data) => {
-    const { text, userId } = data
-    const message = await modify.getCreator().startMessage();
-    message
+    const botUser = (await app.getAccessors()
+        .reader.getUserReader()
+        .getAppUser(app.getID())) as IUser;
+
+    const msg = modify.getCreator().startMessage()
+        .setSender(botUser)
+        .setUsernameAlias(app.botName)
+        .setEmojiAvatar(app.botAvatar)
+        .setText(message)
         .setRoom(room)
-        .setEmojiAvatar(":microphone2:")
-        .setText(text)
-        .setGroupable(false);
-
-
-    // if (room.type !== "l") {
-    //     // do nothing
-    //     await modify
-    //         .getNotifier()
-    //         .notifyUser(userId, message.getMessage());
-    // } else {
-    await modify.getCreator().finish(message);
-    // }
+        .getMessage();
+    try {
+        await modify.getNotifier().notifyUser(user, msg);
+    } catch (error) {
+        console.log(error)
+        app.getLogger().log(error);
+    }
 }
+
 
 
 export const updateSttMessage = async (data, sender: IUser, modify: IModify) => {

@@ -18,8 +18,6 @@ import { QueueAudioCommand } from './commands/SttCommand';
 import { AppSetting, settings } from './config/Setting';
 import { webhookEndpoint } from './endpoints/webhookEndpoint';
 import { getAudioAttachment, isAudio } from './helpers/attachmentHelpers';
-import { sendMessage } from './helpers/messageHelpers';
-import { SttInterface } from './lib/interface/SttInterface';
 import { Assembly } from './lib/providers/Assembly';
 import { Microsoft } from './lib/providers/Microsoft';
 import { Rev } from './lib/providers/Rev';

@@ -2,7 +2,7 @@ import { IHttp, IRead, IModify } from "@rocket.chat/apps-engine/definition/acces
 import { IApi, IApiRequest, IApiResponse } from "@rocket.chat/apps-engine/definition/api";
 import { IUser } from "@rocket.chat/apps-engine/definition/users";
 import { generateJWT, getPayload } from "../../helpers/jwtHelpers";
-import { sendMessage, updateSttMessage } from "../../helpers/messageHelpers";
+import { updateSttMessage } from "../../helpers/messageHelpers";
 import { SpeechToTextApp } from "../../SpeechToTextApp";
 import { SttInterface } from "../interface/SttInterface";
 
