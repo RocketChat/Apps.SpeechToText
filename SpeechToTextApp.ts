@@ -32,6 +32,8 @@ export class SpeechToTextApp extends App implements IPreMessageSentExtend {
 
     public webhook_url: string
 
+    public host
+
     public provider
 
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
@@ -77,8 +79,8 @@ export class SpeechToTextApp extends App implements IPreMessageSentExtend {
         environmentRead: IEnvironmentRead,
         configModify: IConfigurationModify
     ): Promise<boolean> {
-        const siteUrl = await environmentRead.getServerSettings().getValueById('Site_Url');
         const [webhook] = this.getAccessors().providedApiEndpoints.filter((endpoint) => endpoint.path === 'stt-webhook')
+        this.webhook_url = webhook.computedPath
 
         const setting = await environmentRead.getSettings().getById("api-provider")
         switch (setting.value) {

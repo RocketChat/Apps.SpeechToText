@@ -3,6 +3,7 @@ import { ISetting, SettingType } from '@rocket.chat/apps-engine/definition/setti
 export enum AppSetting {
     API_PROVIDER = 'api-provider',
     API_KEY = 'api-key',
+    TUNNEL = 'tunnel',
     JWT_SECRET = 'jwt-secret',
     ASSEMBLY = 'Assembly',
     MICROSOFT = 'Microsoft',
@@ -54,13 +55,4 @@ export const settings: Array<ISetting> = [
         public: true,
         packageValue: "",
     },
-    // {
-    //     id: "min-duration",
-    //     i18nLabel: "Minimum Duration",
-    //     i18nDescription: "Minimum duration for an audio file to be queued to transcription in seconds",
-    //     required: true,
-    //     type: SettingType.NUMBER,
-    //     public: true,
-    //     packageValue: 5,
-    // },
 ];
