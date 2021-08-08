@@ -27,11 +27,11 @@ export class SpeechToTextApp extends App implements IPreMessageSentExtend {
     public botName: string = "SpeechToText-BOT";
     //Avatar alias
     public botAvatar: string = ":microphone2:";
-
+    // host can either be live site URL or a tunnel url in case of localhost
     public host
-
+    // provider for Transcription
     public provider
-
+    // webhook to receive transcript completion statuses
     public webhook_url
 
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
@@ -42,14 +42,15 @@ export class SpeechToTextApp extends App implements IPreMessageSentExtend {
         environmentRead: IEnvironmentRead,
         configModify: IConfigurationModify
     ): Promise<boolean> {
+        // on enable set the webhook URL
         const [webhook] = this.getAccessors().providedApiEndpoints.filter((endpoint) => endpoint.path === 'stt-webhook')
-
         this.webhook_url = webhook.computedPath
-
+        // Check for siteURL & set it to tunnel URL if localhost.
         const siteUrl = await environmentRead.getServerSettings().getValueById('Site_Url');
         if (siteUrl.includes('localhost')) {
             this.host = await environmentRead.getSettings().getValueById(AppSetting.TUNNEL)
         }
+        // Initialize the Provider class and set provider
         const provider = await environmentRead.getSettings().getValueById("api-provider")
         switch (provider) {
             case AppSetting.ASSEMBLY:
@@ -69,6 +70,7 @@ export class SpeechToTextApp extends App implements IPreMessageSentExtend {
         read: IRead,
         http: IHttp
     ): Promise<void> {
+        // set host to tunnel in case of localhost
         if (setting.id === AppSetting.TUNNEL) {
             this.host = setting.value
         }
@@ -79,6 +81,7 @@ export class SpeechToTextApp extends App implements IPreMessageSentExtend {
                 break;
             case AppSetting.MICROSOFT:
                 this.provider = new Microsoft(this)
+                // Register webhook *(Required in case of Microsot cognitive services)
                 this.provider.registerWebhook(http, read)
                 break;
         }
@@ -89,11 +92,9 @@ export class SpeechToTextApp extends App implements IPreMessageSentExtend {
         configuration: IConfigurationExtend,
         environmentRead: IEnvironmentRead
     ): Promise<void> {
-        // set site URL
         const siteUrl = await environmentRead.getServerSettings().getValueById('Site_Url');
-        // user settings
         await Promise.all(settings.map((setting) => configuration.settings.provideSetting(setting)));
-
+        // Add a conditional setting for tunnel URL only in the case of localhost
         if (siteUrl.includes('localhost')) {
             await configuration.settings.provideSetting({
                 id: AppSetting.TUNNEL,

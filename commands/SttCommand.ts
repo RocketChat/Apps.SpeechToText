@@ -45,13 +45,13 @@ export class QueueAudioCommand implements ISlashCommand {
 
         const user = context.getSender()
         const room = context.getRoom()
-
+        // Check to ensure all user settings are provided
         const settings_provided = !!api_key && !!api_provider && !!jwt_secret
 
         if (settings_provided) {
             const [rid, fileId, messageId, audioUrl] = context.getArguments()
             const botUser = await read.getUserReader().getAppUser(this.app.getID())
-
+            // Update the file status
             updateSttMessage({ text: "Queuing file for transcription", color: "#ffbf00", messageId, button: true, buttonText: "Queued.." }, botUser!, modify)
 
             const data = {
@@ -59,7 +59,7 @@ export class QueueAudioCommand implements ISlashCommand {
             }
 
             const queued = await this.app.provider.queueAudio(data, http, read, modify)
-
+            // Update the file status if queued successfully
             if (queued.status === false) {
                 updateSttMessage({ text: queued.message, color: "#dc143c", messageId, button: true, buttonText: "ReQueue", buttonMessage: `/stt-queue ${rid} ${fileId} ${messageId} ${audioUrl}` }, botUser!, modify)
             } else {
@@ -67,6 +67,7 @@ export class QueueAudioCommand implements ISlashCommand {
             }
 
         } else {
+            // notify if settings are not provided
             await notifyUser(this.app, user, modify, room, "User settings missing!!! Please provide all user settings")
         }
 
