@@ -20,8 +20,14 @@ export class Microsoft implements SttInterface {
             return success(validationToken)
 
         }
-        this.getTranscript(request.content, http, read, modify)
+        console.log(request.content, http, read, modify)
+        try {
+            this.getTranscript(request.content, http, read, modify)
+        } catch (error) {
+            console.log(error)
+        }
         return success()
+
     }
 
 
