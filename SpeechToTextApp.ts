@@ -6,14 +6,17 @@ import {
     IHttp,
     ILogger,
     IMessageExtender,
+    IModify,
     IPersistence,
     IRead,
 } from '@rocket.chat/apps-engine/definition/accessors';
 import { ApiSecurity, ApiVisibility } from '@rocket.chat/apps-engine/definition/api';
 import { App } from '@rocket.chat/apps-engine/definition/App';
-import { IMessage, IPreMessageSentExtend, MessageActionButtonsAlignment, MessageActionType } from '@rocket.chat/apps-engine/definition/messages';
+import { IMessage, IPostMessageSent, IPreMessageSentExtend, MessageActionButtonsAlignment, MessageActionType } from '@rocket.chat/apps-engine/definition/messages';
 import { IAppInfo } from '@rocket.chat/apps-engine/definition/metadata';
 import { ISetting, SettingType } from '@rocket.chat/apps-engine/definition/settings';
+import { IUser } from '@rocket.chat/apps-engine/definition/users';
+import { send } from 'process';
 import { QueueAudioCommand } from './commands/SttCommand';
 import { AppSetting, settings } from './config/Setting';
 import { webhookEndpoint } from './endpoints/webhookEndpoint';
@@ -21,7 +24,7 @@ import { getAudioAttachment, isAudio } from './helpers/attachmentHelpers';
 import { Assembly } from './lib/providers/Assembly';
 import { Microsoft } from './lib/providers/Microsoft';
 
-export class SpeechToTextApp extends App implements IPreMessageSentExtend {
+export class SpeechToTextApp extends App implements IPostMessageSent {
 
     // username alias
     public botName: string = "SpeechToText-BOT";
@@ -43,7 +46,9 @@ export class SpeechToTextApp extends App implements IPreMessageSentExtend {
         configModify: IConfigurationModify
     ): Promise<boolean> {
         // on enable set the webhook URL
+
         const [webhook] = this.getAccessors().providedApiEndpoints.filter((endpoint) => endpoint.path === 'stt-webhook')
+
         this.webhook_url = webhook.computedPath
         // Check for siteURL & set it to tunnel URL if localhost.
         const siteUrl = await environmentRead.getServerSettings().getValueById('Site_Url');
@@ -125,7 +130,7 @@ export class SpeechToTextApp extends App implements IPreMessageSentExtend {
 
 
 
-    public async checkPreMessageSentExtend(
+    public async checkPostMessageSent(
         message: IMessage,
         read: IRead,
         http: IHttp
@@ -135,30 +140,77 @@ export class SpeechToTextApp extends App implements IPreMessageSentExtend {
 
     }
 
-    public async executePreMessageSentExtend(message: IMessage, extend: IMessageExtender, read: IRead, http: IHttp, persistence: IPersistence): Promise<IMessage> {
+    // public async executePreMessageSentExtend(message: IMessage, extend: IMessageExtender, read: IRead, http: IHttp, persistence: IPersistence): Promise<IMessage> {
+    //     // console.log(message)
+    //     const audioAttachment = getAudioAttachment(message)
+    //     const rid = message.room.id
+    //     const fileId = message.file?._id
+    //     const messageId = message.id
+    //     const audioUrl = audioAttachment.audioUrl
+    //     console.log("________________________-")
 
+    //     console.log("________________________-")
+    //     // adding a slashcommand button with required fields
+    //     extend.addAttachment({
+    //         color: "#2576F5",
+    //         actionButtonsAlignment: MessageActionButtonsAlignment.HORIZONTAL,
+    //         title: { value: "SpeechToText" },
+    //         text: `Queue audio file for transcription...`,
+    //         actions: [
+    //             {
+    //                 text: 'Transcribe',
+    //                 type: MessageActionType.BUTTON,
+    //                 msg_in_chat_window: true,
+    //                 msg: `/stt-queue ${rid} ${fileId} ${messageId} ${audioUrl}`,
+    //             },
+    //         ],
+    //     })
+    //     console.log(extend.getMessage())
+
+    //     return message
+
+    // }
+
+    public async executePostMessageSent(message: IMessage, read: IRead, http: IHttp, persistence: IPersistence, modify: IModify): Promise<void>{
+        // console.log(message)
+        // console.log('----->>>>messageID',message.id)
         const audioAttachment = getAudioAttachment(message)
         const rid = message.room.id
         const fileId = message.file?._id
-        const messageId = message.id
+        const messageId = message.id as string
         const audioUrl = audioAttachment.audioUrl
-        // adding a slashcommand button with required fields
-        extend.addAttachment({
-            color: "#2576F5",
-            actionButtonsAlignment: MessageActionButtonsAlignment.HORIZONTAL,
-            title: { value: "SpeechToText" },
-            text: `Queue audio file for transcription...`,
-            actions: [
-                {
-                    text: 'Transcribe',
-                    type: MessageActionType.BUTTON,
-                    msg_in_chat_window: true,
-                    msg: `/stt-queue ${rid} ${fileId} ${messageId} ${audioUrl}`,
-                },
-            ],
-        })
+        const sender = message.sender
 
-        return message
+        const botUser = await read.getUserReader().getAppUser(this.getID())
+
+        const messageUpdater = modify.getUpdater()
+        let builder = await messageUpdater.message(messageId, sender!)
+        let attachments = builder.getAttachments()
+
+       try {
+           builder.addAttachment({
+               color: "#2576F5",
+               actionButtonsAlignment: MessageActionButtonsAlignment.HORIZONTAL,
+               title: { value: "SpeechToText" },
+               text: `Queue audio file for transcription...`,
+               actions: [
+                   {
+                       text: 'Transcribe',
+                       type: MessageActionType.BUTTON,
+                       msg_in_chat_window: true,
+                       msg: `/stt-queue ${rid} ${fileId} ${messageId} ${audioUrl}`,
+                   },
+               ],
+           }).setEditor(sender)
+           await messageUpdater.finish(builder)
+
+       } catch (error) {
+           console.log(error)
+       }
+        // console.log(extend.getMessage())
+
+        // return message
 
     }
+
 }
