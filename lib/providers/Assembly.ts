@@ -53,7 +53,7 @@ export class Assembly implements SttInterface {
             },
         });
         if (response && response.data.status === "queued") {
-            return { status: true, message: "Queued for transcriptionn" }
+            return { status: true, message: "Queued for transcription" }
         }
         return { status: false, message: response.data.error }
     }

@@ -5,18 +5,15 @@ import {
     IEnvironmentRead,
     IHttp,
     ILogger,
-    IMessageExtender,
     IModify,
     IPersistence,
     IRead,
 } from '@rocket.chat/apps-engine/definition/accessors';
 import { ApiSecurity, ApiVisibility } from '@rocket.chat/apps-engine/definition/api';
 import { App } from '@rocket.chat/apps-engine/definition/App';
-import { IMessage, IPostMessageSent, IPreMessageSentExtend, MessageActionButtonsAlignment, MessageActionType } from '@rocket.chat/apps-engine/definition/messages';
+import { IMessage, IPostMessageSent, MessageActionButtonsAlignment, MessageActionType } from '@rocket.chat/apps-engine/definition/messages';
 import { IAppInfo } from '@rocket.chat/apps-engine/definition/metadata';
 import { ISetting, SettingType } from '@rocket.chat/apps-engine/definition/settings';
-import { IUser } from '@rocket.chat/apps-engine/definition/users';
-import { send } from 'process';
 import { QueueAudioCommand } from './commands/SttCommand';
 import { AppSetting, settings } from './config/Setting';
 import { webhookEndpoint } from './endpoints/webhookEndpoint';
@@ -111,7 +108,8 @@ export class SpeechToTextApp extends App implements IPostMessageSent {
                 packageValue: "",
             })
         } else {
-            this.host = siteUrl.slice(0, -1)
+            // remove trailing slash from site url
+            this.host = siteUrl.replace(/\/+$/, '')
         }
 
         // API Webhook

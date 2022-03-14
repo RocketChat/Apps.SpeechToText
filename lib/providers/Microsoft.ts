@@ -110,7 +110,7 @@ export class Microsoft implements SttInterface {
         if (response.data.error) {
             return { status: false, message: `FAILED !! ${response.data.error.message}` }
         } else {
-            return { status: true, message: "Queued for transcriptionn" }
+            return { status: true, message: "Queued for transcription" }
         }
     }
 
